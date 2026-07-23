@@ -15,15 +15,13 @@ import org.koin.test.check.checkModules
 
 /**
  * Koin resolves at runtime, so a missing binding would otherwise surface as a crash on first use.
- * This is what replaces Hilt's compile-time graph check — keep it in CI.
+ * This test is meant to avoid that.
  *
  * `checkModules` is deprecated in favour of `verify()`, but `verify()` only walks constructors it
  * can see: our definitions are lambdas returning interfaces, so it passes vacuously. `checkModules`
- * actually instantiates the graph, which is the check worth having.
+ * actually instantiates the graph.
  *
- * The Android-backed bindings are swapped for fakes — Room, `AudioRecord`, `SensorManager` and
- * `NotificationManager` all need a real `Context`, which would drag Robolectric into an otherwise
- * plain JVM test. What is being verified is the shape of the graph, not those implementations.
+ * The bindings are all fake this is just meant to test the dependency graph shape.
  */
 class KoinModuleVerificationTest {
 

@@ -144,8 +144,8 @@ class FocusSessionViewModel(
 
     /**
      * A refresh the user did not ask for stays silent when it fails. The startup refresh is
-     * opportunistic — every session is already on the device — so announcing "no connection"
-     * before the user has touched anything reports a problem that does not exist.
+     * opportunistic, it's already saved offline, so announcing "no connection"
+     * before the user has touched anything is unnecessary.
      */
     private fun refreshSessions(userInitiated: Boolean) {
         viewModelScope.launch {

@@ -16,8 +16,7 @@ import androidx.core.content.ContextCompat
 
 /**
  * Permission state is Android framework state, so it stays in the UI layer rather than being
- * hoisted into the ViewModel — the ViewModel would then need a `Context` and could not be
- * unit-tested.
+ * hoisted into the ViewModel so we don't pass context to it
  */
 @Stable
 class FocusPermissionsState(
@@ -38,8 +37,6 @@ fun rememberFocusPermissionsState(): FocusPermissionsState {
     val launcher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.RequestMultiplePermissions(),
     ) { results ->
-        // Notifications are requested alongside but are not required to run a session — a denied
-        // notification permission only costs the user the distraction alerts.
         hasMicrophone = results[Manifest.permission.RECORD_AUDIO] ?: hasMicrophone
     }
 

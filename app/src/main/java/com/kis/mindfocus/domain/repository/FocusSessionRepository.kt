@@ -6,7 +6,8 @@ import kotlinx.coroutines.flow.Flow
 
 /**
  * Local-first: every write lands in the local store immediately and returns, then the session is
- * pushed to the API. A failed push is not a failed session — [syncSession] can be retried.
+ * pushed to the API. Currently the repository does observation, session mutation and sync which is fine at this size
+ * but should probably be split in case it grows.
  */
 interface FocusSessionRepository {
 
