@@ -9,11 +9,11 @@ plugins {
 }
 
 android {
-    namespace = "com.vonbraunlabs.mindfocus"
+    namespace = "com.kis.mindfocus"
     compileSdk = 36
 
     defaultConfig {
-        applicationId = "com.vonbraunlabs.mindfocus"
+        applicationId = "com.kis.mindfocus"
         minSdk = 26
         targetSdk = 36
         versionCode = 1
@@ -21,8 +21,6 @@ android {
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
-        // Points at the mock REST API. Override per build type / flavour rather than
-        // hardcoding the host in a DI module.
         buildConfigField("String", "BASE_URL", "\"https://mindfocus.mock.local/api/\"")
     }
 
@@ -62,6 +60,7 @@ dependencies {
     implementation(libs.androidx.lifecycle.runtime.compose)
     implementation(libs.androidx.lifecycle.viewmodel.compose)
     implementation(libs.androidx.activity.compose)
+    implementation(libs.androidx.navigation.compose)
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.androidx.ui)
     implementation(libs.androidx.ui.graphics)
