@@ -30,6 +30,9 @@ interface FocusSessionDao {
     @Query("SELECT * FROM focus_sessions WHERE id = :id")
     suspend fun getSession(id: String): SessionWithDistractions?
 
+    @Query("SELECT * FROM focus_sessions WHERE ended_at IS NULL ORDER BY started_at DESC LIMIT 1")
+    suspend fun getActiveSession(): FocusSessionEntity?
+
     @Query("SELECT * FROM focus_sessions WHERE is_synced = 0")
     suspend fun getUnsyncedSessions(): List<FocusSessionEntity>
 
@@ -50,6 +53,18 @@ interface FocusSessionDao {
 
     @Upsert
     suspend fun upsertDistractions(events: List<DistractionEventEntity>)
+
+    /**
+     * Enforces the one-active-session invariant, returning the id of whichever session is active
+     * afterwards. The check and the insert share a transaction, so two concurrent starts cannot
+     * both see "none active" — the second gets back the id the first inserted.
+     */
+    @Transaction
+    suspend fun insertSessionIfNoneActive(session: FocusSessionEntity): String {
+        getActiveSession()?.let { return it.id }
+        insertSession(session)
+        return session.id
+    }
 
     @Transaction
     suspend fun upsertSessionsWithDistractions(sessions: List<SessionWithDistractions>) {

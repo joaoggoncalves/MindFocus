@@ -39,6 +39,8 @@ class KoinModuleVerificationTest {
             modules(
                 coroutinesModule,
                 networkModule,
+                // Unit tests build against the debug variant, so this is the fake-backed binding.
+                apiModule,
                 dataModule,
                 detectionModule,
                 featureModule,

@@ -25,14 +25,13 @@ class FakeFocusSessionRepository(private val clock: Clock) : FocusSessionReposit
     override fun observeActiveSession(): Flow<FocusSession?> =
         sessions.map { list -> list.firstOrNull { it.isActive } }
 
+    /** Idempotent, mirroring the real repository's one-active-session invariant. */
     override suspend fun startSession(): Result<FocusSession> = orFail {
-        val session = FocusSession(
+        sessions.value.firstOrNull { it.isActive } ?: FocusSession(
             id = "session-${nextId++}",
             startedAt = clock.instant(),
             endedAt = null,
-        )
-        sessions.value += session
-        session
+        ).also { sessions.value += it }
     }
 
     override suspend fun endSession(sessionId: String): Result<FocusSession> = orFail {

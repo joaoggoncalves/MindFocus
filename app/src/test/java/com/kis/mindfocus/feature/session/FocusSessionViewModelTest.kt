@@ -11,6 +11,7 @@ import com.kis.mindfocus.testing.RecordingNotifier
 import com.kis.mindfocus.testing.MainDispatcherRule
 import com.kis.mindfocus.testing.VirtualClock
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.advanceTimeBy
@@ -72,6 +73,25 @@ class FocusSessionViewModelTest {
             cancelAndIgnoreRemainingEvents()
         }
     }
+
+    /**
+     * Two taps land inside the window before the first write reaches `uiState`, so the button is
+     * still showing Start for both. Nothing here collects `uiState`, which keeps the elapsed-time
+     * ticker unsubscribed and lets `advanceUntilIdle` return.
+     */
+    @Test
+    fun `starting twice in quick succession leaves a single active session`() =
+        runTest(dispatcher) {
+            val viewModel = createViewModel()
+
+            viewModel.onStartSession()
+            viewModel.onStartSession()
+            advanceUntilIdle()
+
+            val sessions = repository.observeSessions().first()
+            assertEquals(1, sessions.count { it.isActive })
+            assertNull(viewModel.uiState.value.error)
+        }
 
     @Test
     fun `elapsed time advances once per second while a session runs`() = runTest(dispatcher) {

@@ -37,15 +37,24 @@ class DefaultFocusSessionRepository(
     override fun observeActiveSession(): Flow<FocusSession?> =
         dao.observeActiveSession().map { it?.toDomain() }.flowOn(ioDispatcher)
 
+    /**
+     * Idempotent: starting while a session is already running returns that session rather than
+     * failing. In a slower device it might be possible for the user to "double tap" the start button since it waits for the entire
+     * Room round-trip to switch to the stop button.
+     */
     override suspend fun startSession(): Result<FocusSession> = withContext(ioDispatcher) {
         runCatchingData {
-            val session = FocusSession(
+            val candidate = FocusSession(
                 id = idGenerator.newId(),
                 startedAt = clock.instant(),
                 endedAt = null,
             )
-            dao.insertSession(session.toEntity())
-            session
+            val activeId = dao.insertSessionIfNoneActive(candidate.toEntity())
+            if (activeId == candidate.id) {
+                candidate
+            } else {
+                dao.getSession(activeId)?.toDomain() ?: throw DataError.NotFound(activeId)
+            }
         }
     }
 

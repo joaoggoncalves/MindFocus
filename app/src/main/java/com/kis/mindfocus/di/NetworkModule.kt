@@ -2,7 +2,6 @@ package com.kis.mindfocus.di
 
 import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
 import com.kis.mindfocus.BuildConfig
-import com.kis.mindfocus.data.remote.api.FocusSessionApi
 import kotlinx.serialization.json.Json
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
@@ -46,5 +45,6 @@ val networkModule = module {
             .build()
     }
 
-    single<FocusSessionApi> { get<Retrofit>().create(FocusSessionApi::class.java) }
+    // FocusSessionApi is bound in `apiModule`, which is per-variant: Retrofit in release, an
+    // in-memory fake in debug.
 }
